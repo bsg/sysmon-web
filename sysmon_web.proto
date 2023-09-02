@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package sysmon_web.msg;
+
+message Stat {
+    double uptime = 1;
+}

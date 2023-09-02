@@ -6,8 +6,8 @@ interface PlotProps {
     points: number[],
     width: number,
     height: number,
-    divX: number,
-    divY: number,
+    pointsX: number,
+    pointsY: number,
     label?: string
 }
 
@@ -23,15 +23,15 @@ export default function Plot(props: PlotProps) {
 
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-            ctx.fillStyle = hexToRGBA(props.color, 0.2);
+            ctx.fillStyle = hexToRGBA(props.color, 0.4);
             ctx.strokeStyle = hexToRGBA(props.color, 1.0);
             ctx.lineWidth = 2;
             ctx.lineJoin = 'round';
             ctx.lineCap = 'round';
 
 
-            var pixelsPerDivX = width / props.divX;
-            var pixelsPerDivY = height / props.divY;
+            var pixelsPerDivX = width / props.pointsX;
+            var pixelsPerDivY = height / props.pointsY;
 
             let prevPoint = [0, height];
             props.points.forEach((val, i, arr) => {

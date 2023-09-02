@@ -6,9 +6,6 @@ import { sysmon_web } from './proto/msg';
 
 import { formatBytes, uptimeToString } from './util';
 
-import dynamic from "next/dynamic";
-const GaugeComponent = dynamic(() => import('react-gauge-component'), { ssr: false });
-
 import Plot from './plot';
 
 export default function Home() {
@@ -70,14 +67,11 @@ export default function Home() {
             <div>
                 {stats ? <span>Memory: {getMemoryUsage()}</span> : null}
             </div>
-            <div style={{ width: 200 }}>
-                <GaugeComponent minValue={0} maxValue={100} value={stats ? stats.cpuUsage[0] * 100 : 0} labels={{ tickLabels: { hideMinMax: true }, valueLabel: { maxDecimalDigits: 0 } }} />
-            </div>
             <div>
-                <div className="grid grid-cols-2 gap-2" style={{ width: "fit-content" }}>
+                <div className="grid grid-cols-2 gap-1" style={{ width: "fit-content" }}>
                     {points.map((_, i) =>
                         <div style={{ borderColor: "#aaa", borderStyle: "solid", borderWidth: 1, width: 300 }}>
-                            <Plot label={"cpu" + (i + 1)} color="#068691" points={points[i]} height={40} width={300} divX={100} divY={100} />
+                            <Plot label={"cpu" + (i + 1)} color="#068691" points={points[i]} height={40} width={300} pointsX={100} pointsY={100} />
                         </div>
                     )}
                 </div>

@@ -18,30 +18,30 @@ export default function Plot(props: PlotProps) {
         const canvas: HTMLCanvasElement | null = canvasRef.current;
         const ctx: CanvasRenderingContext2D | null | undefined = canvas?.getContext("2d");
         if (ctx) {
-            var width = ctx.canvas.width;
-            var height = ctx.canvas.height;
+            var w = ctx.canvas.width;
+            var h = ctx.canvas.height;
 
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
             ctx.fillStyle = hexToRGBA(props.color, 0.4);
             ctx.strokeStyle = hexToRGBA(props.color, 1.0);
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1;
             ctx.lineJoin = 'round';
             ctx.lineCap = 'round';
 
 
-            var pixelsPerDivX = width / props.pointsX;
-            var pixelsPerDivY = height / props.pointsY;
+            var pixelsPerDivX = w / props.pointsX;
+            var pixelsPerDivY = h / props.pointsY;
 
-            let prevPoint = [0, height];
+            let prevPoint = [0, h];
             props.points.forEach((val, i, arr) => {
                 ctx.beginPath();
                 ctx.moveTo(prevPoint[0], prevPoint[1]);
-                ctx.lineTo(i * pixelsPerDivX, height - val * pixelsPerDivY);
-                prevPoint = [i * pixelsPerDivX, height - val * pixelsPerDivY];
+                ctx.lineTo(i * pixelsPerDivX, h - val * pixelsPerDivY);
+                prevPoint = [i * pixelsPerDivX, h - val * pixelsPerDivY];
                 ctx.stroke();
-                ctx.lineTo(i * pixelsPerDivX, height);
-                ctx.lineTo(prevPoint[0] - pixelsPerDivX, height);
+                ctx.lineTo(i * pixelsPerDivX, h);
+                ctx.lineTo(prevPoint[0] - pixelsPerDivX, h);
                 ctx.fill();
             });
 
@@ -50,7 +50,7 @@ export default function Plot(props: PlotProps) {
                 //ctx.stroke();
                 ctx.fillStyle = ctx.strokeStyle;
                 ctx.font = "14px monospace";
-                ctx.fillText(props.label, 0, 14);
+                ctx.fillText(props.label, 1, 13);
             }
         }
     })

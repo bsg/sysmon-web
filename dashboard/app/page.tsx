@@ -11,7 +11,12 @@ import Plot from './plot';
 export default function Home() {
     const { sendMessage, lastMessage, readyState } = useWebSocket("ws://localhost:8080/stats");
     const [stats, setStats] = useState<sysmon_web.msg.Stat>();
-    const [points, setPoints] = useState<[[number]] | []>([]);
+
+    // TODO this better be a circular buffer next time I check
+    // NOTE idx 0 is avg
+    const [cpuUsagePoints, setCpuUsagePoints] = useState<[[number]]>([[0]]);
+    // TODO this better be a circular buffer next time I check
+    const [memUsagePoints, setMemUsagePoints] = useState<[number]>([0]);
 
     const connectionStatus = {
         [ReadyState.CONNECTING]: 'Connecting',
@@ -35,18 +40,30 @@ export default function Home() {
 
     useEffect(() => {
         if (stats) {
+            var sum = 0;
             stats.cpuUsage.forEach((usage, i, _) => {
-                if (!points[i]) {
-                    points[i] = [0];
+                if (!cpuUsagePoints[i + 1]) {
+                    cpuUsagePoints[i + 1] = [0];
                 }
 
-                if (points[i].length >= 100) {
-                    points[i].shift();
+                // NOTE shift cpuavg as well
+                if (cpuUsagePoints[i].length >= 60) {
+                    cpuUsagePoints[i].shift();
                 }
 
-                points[i].push(usage * 100);
-                setPoints(points);
+                cpuUsagePoints[i + 1].push(usage * 100);
+                sum += usage;
             });
+
+            cpuUsagePoints[0].push(sum / stats.cpuUsage.length * 100);
+            setCpuUsagePoints(cpuUsagePoints);
+
+            if (memUsagePoints.length >= 60) {
+                memUsagePoints.shift();
+            }
+            var memPercent = (stats.memTotal - stats.memAvailable) / stats.memTotal * 100;
+            memUsagePoints.push(memPercent);
+            setMemUsagePoints(memUsagePoints);
         }
     }, [stats])
 
@@ -68,12 +85,18 @@ export default function Home() {
                 {stats ? <span>Memory: {getMemoryUsage()}</span> : null}
             </div>
             <div>
-                <div className="grid grid-cols-2 gap-1" style={{ width: "fit-content" }}>
-                    {points.map((_, i) =>
-                        <div style={{ borderColor: "#aaa", borderStyle: "solid", borderWidth: 1, width: 300 }}>
-                            <Plot label={"cpu" + (i + 1)} color="#068691" points={points[i]} height={40} width={300} pointsX={100} pointsY={100} />
+                <div className="grid grid-cols-2 gap-2" style={{ width: "fit-content" }}>
+                    <div className="col-span-2" style={{ borderColor: "#aaa", borderStyle: "solid", borderWidth: 1, width: "fit-content", height: "fit-content" }}>
+                        <Plot label={"cpuavg"} color="#068691" points={cpuUsagePoints[0]} height={80} width={610} pointsX={60} pointsY={100} />
+                    </div>
+                    {cpuUsagePoints.filter((_v, i, _) => i > 0).map((_, i) =>
+                        <div style={{ borderColor: "#aaa", borderStyle: "solid", borderWidth: 1, width: "fit-content", height: "fit-content" }}>
+                            <Plot label={"cpu" + (i + 1)} color="#068691" points={cpuUsagePoints[i]} height={40} width={300} pointsX={60} pointsY={100} />
                         </div>
                     )}
+                    <div className="col-span-2" style={{ borderColor: "#aaa", borderStyle: "solid", borderWidth: 1, width: "fit-content", height: "fit-content" }}>
+                        <Plot label={"mem"} color="#eb9b34" points={memUsagePoints} height={80} width={610} pointsX={60} pointsY={100} />
+                    </div>
                 </div>
             </div>
         </div>

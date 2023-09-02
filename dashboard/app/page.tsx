@@ -60,7 +60,7 @@ export default function Home() {
     }
 
     return (
-        <div style={{ color: '#ddd' }}>
+        <div style={{ color: '#aaa' }}>
             <div>
                 <span>The WebSocket is currently {connectionStatus}</span>
             </div>
@@ -73,11 +73,15 @@ export default function Home() {
             <div style={{ width: 200 }}>
                 <GaugeComponent minValue={0} maxValue={100} value={stats ? stats.cpuUsage[0] * 100 : 0} labels={{ tickLabels: { hideMinMax: true }, valueLabel: { maxDecimalDigits: 0 } }} />
             </div>
-            {points.map((_, i) =>
-                <div style={{borderColor: "#ccc", borderStyle: "solid", borderWidth: 1, margin: 2, width: 400}}>
-                    <Plot color="#068691" points={points[i]} height={50} width={400} divX={100} divY={100} />
+            <div>
+                <div className="grid grid-cols-2 gap-2" style={{ width: "fit-content" }}>
+                    {points.map((_, i) =>
+                        <div style={{ borderColor: "#aaa", borderStyle: "solid", borderWidth: 1, width: 300 }}>
+                            <Plot label={"cpu" + (i + 1)} color="#068691" points={points[i]} height={40} width={300} divX={100} divY={100} />
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 }

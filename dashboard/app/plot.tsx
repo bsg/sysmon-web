@@ -4,6 +4,8 @@ import { hexToRGBA } from "./util";
 interface PlotProps {
     color: string,
     points: number[],
+    width: number,
+    height: number,
     divX: number,
     divY: number
 }
@@ -46,7 +48,7 @@ export default function Plot(props: PlotProps) {
     
     return (
         <div>
-            <canvas width={600} height={120} style={{borderColor: "#ccc", borderWidth: 1, borderStyle: "solid"}} ref={canvasRef}/>
+            <canvas width={props.width} height={props.height} ref={canvasRef}/>
         </div>
     )
 }

@@ -17,3 +17,19 @@ function formatBytes(bytes: number, decimals = 2) {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 export {formatBytes}
+
+function hexToRGBA(hex: string, alpha: number) {
+    var r, g, b;
+    if (hex.length == 4 && hex[0] == "#") {
+        r = parseInt(hex[1] + hex[1], 16);
+        g = parseInt(hex[2] + hex[2], 16);
+        b = parseInt(hex[3] + hex[3], 16);
+    } else if (hex.length == 7 && hex[0] == "#") {
+        r = parseInt(hex.substring(1, 3), 16);
+        g = parseInt(hex.substring(3, 5), 16);
+        b = parseInt(hex.substring(5, 7), 16);
+    }
+
+    return "rgba(" + r + ", " + g + ", " + b + ", " + alpha + ")";
+}
+export {hexToRGBA}

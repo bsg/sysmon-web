@@ -9,10 +9,12 @@ import { formatBytes, uptimeToString } from './util';
 import dynamic from "next/dynamic";
 const GaugeComponent = dynamic(() => import('react-gauge-component'), { ssr: false });
 
+import Plot from './plot';
+
 export default function Home() {
     const { sendMessage, lastMessage, readyState } = useWebSocket("ws://localhost:8080/stats");
     const [stats, setStats] = useState<sysmon_web.msg.Stat>();
-
+    const [points, setPoints] = useState([0]);
 
     const connectionStatus = {
         [ReadyState.CONNECTING]: 'Connecting',
@@ -32,6 +34,12 @@ export default function Home() {
             }
         }
         updateStats();
+        if (stats) {
+            if(points.length >= 100) {
+                points.shift();
+            }
+                setPoints(points.concat([stats.cpuUsage[0] * 100]));
+        }
     }, [lastMessage]);
 
     function getMemoryUsage() {
@@ -41,7 +49,7 @@ export default function Home() {
     }
 
     return (
-        <div>
+        <div style={{ color: '#ddd' }}>
             <div>
                 <span>The WebSocket is currently {connectionStatus}</span>
             </div>
@@ -51,28 +59,11 @@ export default function Home() {
             <div>
                 {stats ? <span>Memory: {getMemoryUsage()}</span> : null}
             </div>
+            <div style={{ width: 200 }}>
+                <GaugeComponent minValue={0} maxValue={100} value={stats ? stats.cpuUsage[0] * 100 : 0} labels={{ tickLabels: { hideMinMax: true }, valueLabel: { maxDecimalDigits: 0 } }} />
+            </div>
             <div>
-                <GaugeComponent style={{ width: 250 }} arc={{
-
-                    subArcs: [
-                        {
-                            limit: 25,
-                            color: '#5BE12C',
-                        },
-                        {
-                            limit: 50,
-                            color: '#F5CD19',
-                        },
-                        {
-                            limit: 75,
-                            color: '#F58B19',
-                        },
-                        {
-                            limit: 100,
-                            color: '#EA4228',
-                        },
-                    ]
-                }} labels={{ valueLabel: { maxDecimalDigits: 0 }, tickLabels: { hideMinMax: true } }} value={stats ? stats.cpuUsage[0] * 100 : 0} />
+                <Plot color="#c00" points={points} divX={100} divY={100} />
             </div>
         </div>
     );

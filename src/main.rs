@@ -6,12 +6,9 @@ use tokio::time::{sleep, Duration};
 use warp::ws::WebSocket;
 use warp::Filter;
 
-pub mod sysmon_web {
-    pub mod msg {
-        include!(concat!(env!("OUT_DIR"), "/sysmon_web.msg.rs"));
-    }
+pub mod msg {
+    include!(concat!(env!("OUT_DIR"), "/sysmon_web.msg.rs"));
 }
-use sysmon_web::msg;
 
 use crate::proc::Proc;
 
@@ -40,30 +37,34 @@ async fn client_connection(ws: WebSocket) {
     let (mut user_ws_tx, mut _user_ws_rx) = ws.split();
 
     let task = tokio::task::spawn(async move {
+        let mut proc = Proc::new().unwrap();
+
         let mut run = true;
         while run {
             use prost::Message;
 
-            sleep(Duration::from_secs(1)).await;
-
-            let mut msg = msg::Stat::default();
-            msg.uptime = Proc::new().unwrap().uptime;
+            sleep(Duration::from_millis(1000)).await;
 
             let mut buf: Vec<u8> = Vec::new();
-            buf.reserve(msg.encoded_len());
+            match proc.get_stats() {
+                Ok(stat) => {
+                    buf.reserve(stat.encoded_len());
 
-            match msg.encode(&mut buf) {
-                Ok(_) => (),
-                Err(_) => eprintln!("ERROR"),
+                    match stat.encode(&mut buf) {
+                        Ok(_) => (),
+                        Err(_) => eprintln!("ERROR"),
+                    }
+
+                    user_ws_tx
+                        .send(warp::ws::Message::binary(buf))
+                        .unwrap_or_else(|e| {
+                            eprintln!("websocket send error: {}", e);
+                            run = false;
+                        })
+                        .await;
+                }
+                Err(_) => todo!(),
             }
-
-            user_ws_tx
-                .send(warp::ws::Message::binary(buf))
-                .unwrap_or_else(|e| {
-                    eprintln!("websocket send error: {}", e);
-                    run = false;
-                })
-                .await;
         }
     });
 

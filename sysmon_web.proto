@@ -2,6 +2,24 @@ syntax = "proto3";
 
 package sysmon_web.msg;
 
+message CpuTime {
+    uint64 user = 1;
+    uint64 nice = 2;
+    uint64 system = 3;
+    uint64 idle = 4;
+    uint64 iowait = 5;
+    uint64 irq = 6;
+    uint64 softirq = 7;
+    uint64 steal = 8;
+    uint64 guest = 9;
+    uint64 guest_nice = 10;
+}
+
 message Stat {
     double uptime = 1;
+    repeated CpuTime cpu_time = 2;
+    uint64 mem_total = 3;
+    uint64 mem_free = 4;
+    uint64 mem_available = 5;
+    repeated double cpu_usage = 6;
 }

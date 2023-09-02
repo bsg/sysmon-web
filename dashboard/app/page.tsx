@@ -4,7 +4,10 @@ import { useState, useEffect } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { sysmon_web } from './proto/msg';
 
-import {uptimeToString} from './util';
+import { formatBytes, uptimeToString } from './util';
+
+import dynamic from "next/dynamic";
+const GaugeComponent = dynamic(() => import('react-gauge-component'), { ssr: false });
 
 export default function Home() {
     const { sendMessage, lastMessage, readyState } = useWebSocket("ws://localhost:8080/stats");
@@ -29,7 +32,13 @@ export default function Home() {
             }
         }
         updateStats();
-}, [lastMessage]);
+    }, [lastMessage]);
+
+    function getMemoryUsage() {
+        if (stats) {
+            return formatBytes(stats.memTotal - stats.memAvailable) + " / " + formatBytes(stats.memTotal);
+        }
+    }
 
     return (
         <div>
@@ -38,6 +47,32 @@ export default function Home() {
             </div>
             <div>
                 {stats ? <span>Uptime: {uptimeToString(stats.uptime)}</span> : null}
+            </div>
+            <div>
+                {stats ? <span>Memory: {getMemoryUsage()}</span> : null}
+            </div>
+            <div>
+                <GaugeComponent style={{ width: 250 }} arc={{
+
+                    subArcs: [
+                        {
+                            limit: 25,
+                            color: '#5BE12C',
+                        },
+                        {
+                            limit: 50,
+                            color: '#F5CD19',
+                        },
+                        {
+                            limit: 75,
+                            color: '#F58B19',
+                        },
+                        {
+                            limit: 100,
+                            color: '#EA4228',
+                        },
+                    ]
+                }} labels={{ valueLabel: { maxDecimalDigits: 0 }, tickLabels: { hideMinMax: true } }} value={stats ? stats.cpuUsage[0] * 100 : 0} />
             </div>
         </div>
     );

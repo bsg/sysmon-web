@@ -1,9 +1,9 @@
 function uptimeToString(seconds: number) {
     var date = new Date(0);
     date.setSeconds(seconds);
-    return date.toISOString().substring(11, 19);
+    return Math.floor(seconds / 86400).toString().padStart(3, "0") + ":" + date.toISOString().substring(11, 19);
 }
-export {uptimeToString}
+export { uptimeToString }
 
 function formatBytes(bytes: number, decimals = 2) {
     if (!+bytes) return '0 Bytes'
@@ -16,7 +16,7 @@ function formatBytes(bytes: number, decimals = 2) {
 
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
-export {formatBytes}
+export { formatBytes }
 
 function hexToRGBA(hex: string, alpha: number) {
     var r, g, b;
@@ -32,4 +32,4 @@ function hexToRGBA(hex: string, alpha: number) {
 
     return "rgba(" + r + ", " + g + ", " + b + ", " + alpha + ")";
 }
-export {hexToRGBA}
+export { hexToRGBA }

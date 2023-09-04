@@ -75,7 +75,7 @@ export default function Home() {
 
     return (
         <div style={{ color: '#aaa' }}>
-            <div>
+            {/* <div>
                 <span>The WebSocket is currently {connectionStatus}</span>
             </div>
             <div>
@@ -83,21 +83,26 @@ export default function Home() {
             </div>
             <div>
                 {stats ? <span>Memory: {getMemoryUsage()}</span> : null}
-            </div>
-            <div>
-                <div className="grid grid-cols-2 gap-2" style={{ width: "fit-content" }}>
+            </div> */}
+            <div className='grid grid-cols-4 gap-0 items-center'>
+                <div></div>
+                <div className="grid gri-cols-2 gap-2 col-span-2" style={{ width: "fit-content" }}>
+                    <div>
+                        {stats ? <span>Uptime: {uptimeToString(stats.uptime)}</span> : null}
+                    </div>
                     <div className="col-span-2" style={{ borderColor: "#aaa", borderStyle: "solid", borderWidth: 1, width: "fit-content", height: "fit-content" }}>
-                        <Plot label={"cpuavg"} color="#068691" points={cpuUsagePoints[0]} height={80} width={610} pointsX={60} pointsY={100} />
+                        <Plot label={"cpuavg"} color="#068691" points={cpuUsagePoints[0]} height={80} width={850} pointsX={60} pointsY={100} drawGauge={true}/>
                     </div>
                     {cpuUsagePoints.filter((_v, i, _) => i > 0).map((_, i) =>
                         <div style={{ borderColor: "#aaa", borderStyle: "solid", borderWidth: 1, width: "fit-content", height: "fit-content" }}>
-                            <Plot label={"cpu" + (i + 1)} color="#068691" points={cpuUsagePoints[i]} height={40} width={300} pointsX={60} pointsY={100} />
+                            <Plot label={"cpu" + (i + 1)} color="#068691" points={cpuUsagePoints[i]} width={420} height={40} pointsX={60} pointsY={100} />
                         </div>
                     )}
                     <div className="col-span-2" style={{ borderColor: "#aaa", borderStyle: "solid", borderWidth: 1, width: "fit-content", height: "fit-content" }}>
-                        <Plot label={"mem"} color="#eb9b34" points={memUsagePoints} height={80} width={610} pointsX={60} pointsY={100} />
+                        <Plot label={"mem"} color="#eb9b34" points={memUsagePoints} height={80} width={850} pointsX={60} pointsY={100} />
                     </div>
                 </div>
+                <div></div>
             </div>
         </div>
     );
